@@ -293,11 +293,12 @@
 				// sample indices with replacement
 				for (let i = 0; i < nFlipsPerRound; i++) {
 					const idx = Math.floor(Math.random() * nCoins);
-					const isHeads = coins[idx]; // either 0 or 1
+					const wasHeads = coins[idx]; // either 0 or 1
+					const isHeads = +(Math.random() < 0.5);
 					// subtracts 1 if isHeads === 1 (is heads), subtracts -1 (adds 1) if 0
 					// (is tails)
-					delta -= 2 * isHeads - 1;
-					coins[idx] = 1 - isHeads;
+					delta += isHeads - wasHeads;
+					coins[idx] = isHeads;
 				}
 				return delta;
 			}

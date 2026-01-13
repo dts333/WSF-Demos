@@ -238,7 +238,7 @@ function getBeakerOutlineData() {
 			V ${midLeftY}
 			${getEllipsePath(midLeftY, true, false)}
 			V ${botLeftY}
-			a ${ellipseWidth / 2} ${ellipseHeight / 2} 0 0 1 ${-ellipseWidth} 0
+			a ${ellipseWidth / 2} ${ellipseHeight / 2} 0 0 0 ${-ellipseWidth} 0
 			Z
 			`,
 			"stroke-opacity": 0,
@@ -849,8 +849,7 @@ function getEquationChainData(stage) {
 		.map(i => getEquationDipeptideData(i, stage === STAGES.ligand))
 		.flat(Infinity)
 		.sort((a, b) => {
-			const shapeToNum = shape =>
-				shape === "path" ? 2 : shape === "line" ? 1 : 0;
+			const shapeToNum = shape => (shape === "path" ? 2 : shape === "line" ? 1 : 0);
 			const aVal = shapeToNum(a.shape);
 			const bVal = shapeToNum(b.shape);
 			return bVal - aVal;
@@ -967,14 +966,16 @@ const LIGAND_SELECTOR = "path.chemical-obj";
 function fadeligands(svg, fadeDuration, fadeDelay) {
 	fadeDelay = fadeDelay ?? 0;
 
-	svg.selectAll(`${LIGAND_SELECTOR}.ligand-exterior`)
+	svg
+		.selectAll(`${LIGAND_SELECTOR}.ligand-exterior`)
 		.transition()
 		.delay(fadeDelay)
 		.duration(fadeDuration)
 		.style("opacity", 0)
 		.end()
 		.then(() => {
-			svg.selectAll(LIGAND_SELECTOR)
+			svg
+				.selectAll(LIGAND_SELECTOR)
 				.transition()
 				.duration(100)
 				.attr("stroke-width", 0)
@@ -1010,10 +1011,7 @@ function dropSubstanceIntoBeaker(stage) {
 		.delay(d => d.delay)
 		.attr(
 			"transform",
-			d =>
-				`translate(${beakerXScale(d.x)} ${beakerYScale(
-					CONFIG.fluidHeight + 0.1,
-				)})`,
+			d => `translate(${beakerXScale(d.x)} ${beakerYScale(CONFIG.fluidHeight + 0.1)})`,
 		);
 
 	if (stage === STAGES.enzyme) {
@@ -1066,15 +1064,13 @@ const graphRecedeDuration = 500;
 const energyWell3DTransitionDuration = 7500;
 
 function applyDataToSvg(svg, { stage, data, tweens, thens }) {
-	const {
-		[DIPEPTIDE_SELECTOR]: dipeptideData,
-		[LIGAND_SELECTOR]: ligandData,
-	} = groupBy(
-		data,
-		d => `${d.shape}.chemical-obj`,
-		[DIPEPTIDE_SELECTOR, LIGAND_SELECTOR],
-		false,
-	);
+	const { [DIPEPTIDE_SELECTOR]: dipeptideData, [LIGAND_SELECTOR]: ligandData } =
+		groupBy(
+			data,
+			d => `${d.shape}.chemical-obj`,
+			[DIPEPTIDE_SELECTOR, LIGAND_SELECTOR],
+			false,
+		);
 
 	const energyWellFadeDuration =
 		stage === STAGES.initial && prevStage === STAGES.energyWell
@@ -1124,8 +1120,7 @@ function applyDataToSvg(svg, { stage, data, tweens, thens }) {
 				selector: LIGAND_SELECTOR,
 				transition: d3.transition().duration(ligandAppearDuration),
 			});
-			totalTransitionDuration =
-				dipeptideMovementDelay + dipeptideMovementDuration;
+			totalTransitionDuration = dipeptideMovementDelay + dipeptideMovementDuration;
 		} else if (stage === STAGES.ligand) {
 			applyGraphicalObjs(svg, dipeptideData, {
 				selector: DIPEPTIDE_SELECTOR,
@@ -1141,7 +1136,8 @@ function applyDataToSvg(svg, { stage, data, tweens, thens }) {
 			});
 			svg.selectAll(`${LIGAND_SELECTOR}.ligand-exterior`).style("opacity", 0);
 			svg.selectAll(`${LIGAND_SELECTOR}.ligand-interior`).style("opacity", 1);
-			svg.selectAll(`${LIGAND_SELECTOR}.ligand-exterior`)
+			svg
+				.selectAll(`${LIGAND_SELECTOR}.ligand-exterior`)
 				.transition("exterior")
 				.delay(
 					dipeptideMovementDelay +
@@ -1159,9 +1155,7 @@ function applyDataToSvg(svg, { stage, data, tweens, thens }) {
 			firstDipeptide.parentNode.insertBefore(fragment, firstDipeptide);
 
 			totalTransitionDuration =
-				dipeptideMovementDelay +
-				dipeptideMovementDuration * 0.6 +
-				ligandAppearDuration;
+				dipeptideMovementDelay + dipeptideMovementDuration * 0.6 + ligandAppearDuration;
 		} else {
 			throw new Error(`Invalid stage ${stage}`);
 		}
@@ -1189,15 +1183,9 @@ function applyDataToSvg(svg, { stage, data, tweens, thens }) {
 			const t = svg
 				.selectAll(dipeptideSelector)
 				.transition(name)
-				.delay(
-					stage === STAGES.initial
-						? dipeptideResetDelay
-						: dipeptideMovementDelay,
-				)
+				.delay(stage === STAGES.initial ? dipeptideResetDelay : dipeptideMovementDelay)
 				.duration(
-					stage === STAGES.initial
-						? dipeptideResetDuration
-						: dipeptideMovementDuration,
+					stage === STAGES.initial ? dipeptideResetDuration : dipeptideMovementDuration,
 				)
 				.tween(name, tween);
 
@@ -1481,9 +1469,7 @@ function update(stage) {
 				buttons.reset.disabled = stage === STAGES.initial;
 			}
 		},
-		stage === STAGES.initial
-			? 1000 + dipeptideResetDuration
-			: totalTransitionDuration,
+		stage === STAGES.initial ? 1000 + dipeptideResetDuration : totalTransitionDuration,
 	);
 
 	// Do the chemical equation at the bottom
@@ -1499,9 +1485,7 @@ function update(stage) {
 				? defaultEnergyWellFadeDuration
 				: 0,
 		)
-		.duration(
-			stage === STAGES.initial ? dipeptideResetDuration : ligandAppearDuration,
-		);
+		.duration(stage === STAGES.initial ? dipeptideResetDuration : ligandAppearDuration);
 
 	if (stage === STAGES.initial) {
 		const eqnDataOrig = eqnData.map(d => ({ ...d }));
@@ -1611,10 +1595,7 @@ function plotEnergyWell(t) {
 	const diameter = 1;
 
 	const xIndexInterpolator = d3
-		.scaleLinear(
-			[0, well.grid.length - 1],
-			[Math.min(...well.x), Math.max(...well.x)],
-		)
+		.scaleLinear([0, well.grid.length - 1], [Math.min(...well.x), Math.max(...well.x)])
 		.clamp(true);
 
 	const wellIndexToYInterpolator = d3
@@ -1846,9 +1827,7 @@ function plotEnergyWell(t) {
 		showspikes: false,
 	};
 
-	const yMinInterpolator = d3
-		.scaleLinear([1, 2], [0, Math.min(...well.y)])
-		.clamp(true);
+	const yMinInterpolator = d3.scaleLinear([1, 2], [0, Math.min(...well.y)]).clamp(true);
 	const yMaxInterpolator = d3
 		.scaleLinear([1, 2], [2 * Math.PI, Math.max(...well.y)])
 		.clamp(true);
