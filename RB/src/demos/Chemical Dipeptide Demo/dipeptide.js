@@ -182,7 +182,7 @@ function getBeakerOutlineData() {
 			V ${topLeftY}
 			${getEllipsePath(topLeftY, true)}
 			${getEllipsePath(midLeftY, true)}
-			${getEllipsePath(botLeftY, false)}
+			${getEllipsePath(botLeftY, true)}
 			`,
 			stroke: beakerColor,
 			"stroke-width": strokeWidth,
@@ -221,7 +221,7 @@ function getBeakerOutlineData() {
 		attrs: {
 			d: `
 			M ${leftX} ${botLeftY}
-			${getEllipsePath(botLeftY, true)}
+			${getEllipsePath(botLeftY, false)}
 			`,
 			stroke: d3.interpolate(beakerColor, fluidColor)(0.8),
 			"stroke-width": strokeWidth,
